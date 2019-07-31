@@ -182,6 +182,15 @@ static int test_decrypt_cbc(void)
     }
 }
 
+uint8_t* read_file(char *fileName, int *size)
+{
+	FILE *fp=NULL;
+	uint8_t data[2000];
+	fp=fopen(fileName,"rb");
+	*size=fread(data,sizeof(data),1,fp);
+	return data;
+}
+
 static int test_encrypt_cbc(void)
 {
 #if defined(AES256)
@@ -210,7 +219,14 @@ static int test_encrypt_cbc(void)
                       0x30, 0xc8, 0x1c, 0x46, 0xa3, 0x5c, 0xe4, 0x11, 0xe5, 0xfb, 0xc1, 0x19, 0x1a, 0x0a, 0x52, 0xef,
                       0xf6, 0x9f, 0x24, 0x45, 0xdf, 0x4f, 0x9b, 0x17, 0xad, 0x2b, 0x41, 0x7b, 0xe6, 0x6c, 0x37, 0x10 };
     struct AES_ctx ctx;
+	uint8_t *data=NULL;
+	int size_of_file;
+	data=read_file("sample.txt",&size_of_file);
+	for(int i=0;i<size_of_file;i++)
+		printf("%02X ",data[i]);
 
+
+	
     AES_init_ctx_iv(&ctx, key, iv);
     AES_CBC_encrypt_buffer(&ctx, in, 64);
 
