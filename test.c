@@ -172,7 +172,7 @@ static int test_decrypt_cbc(char *inKey, char *fileName)
                       0x30, 0xc8, 0x1c, 0x46, 0xa3, 0x5c, 0xe4, 0x11, 0xe5, 0xfb, 0xc1, 0x19, 0x1a, 0x0a, 0x52, 0xef,
                       0xf6, 0x9f, 0x24, 0x45, 0xdf, 0x4f, 0x9b, 0x17, 0xad, 0x2b, 0x41, 0x7b, 0xe6, 0x6c, 0x37, 0x10 };
 //  uint8_t buffer[64];
-    struct AES_ctx ctx;
+    struct AES_ctx ctx,ctx_decrypt;
 	uint8_t in_key[16],data[2000],data_length,file_size;
 
 	FILE *fp_key=NULL,*fp_data=NULL;
@@ -230,7 +230,18 @@ static int test_decrypt_cbc(char *inKey, char *fileName)
 	{
 		printf("%02x ",data[i]);
 	}
+	
+	
+	AES_init_ctx_iv(&ctx, data, iv);
+    AES_CBC_decrypt_buffer(&ctx, in_key, 16);
 
+	printf("\nKey:\n");
+	for(int i=0;i<16;i++)
+	{
+		printf("%02x ",in_key[i]);
+	}
+	
+	
 	end:
 		if(fp_key)
 			fclose(fp_key);
