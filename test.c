@@ -194,7 +194,7 @@ static int test_decrypt_cbc(char *inKey, char *fileName)
 		goto end;
 	}
 	fseek(fp_data,0,SEEK_END);
-	file_size=ftell(fp);
+	file_size=ftell(fp_data);
 	fseek(fp_data,0,0);
 
 	if((file_size != 0) &&((file_size%16)==0))
