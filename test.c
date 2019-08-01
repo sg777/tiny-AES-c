@@ -267,7 +267,7 @@ static int test_encrypt_cbc(char *inKey, char *fileName)
 	AES_init_ctx_iv(&ctx_key_encrypt, data, iv);
     AES_CBC_encrypt_buffer(&ctx_key_encrypt, in_key,16);
 
-	fp_key_enc=fopen("in_key_enc","rb+");
+	fp_key_enc=fopen("in_key_enc","wb+");
 	if(fp_key_enc==NULL)
 	{
 		printf("\nFailed to open the file in_key_enc");
