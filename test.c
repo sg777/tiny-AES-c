@@ -36,11 +36,12 @@ int main(void)
     return 0;
 #endif
 
-    exit = test_encrypt_cbc() + test_decrypt_cbc() +
+    exit = test_encrypt_cbc();
+	/*+ test_decrypt_cbc() +
 	test_encrypt_ctr() + test_decrypt_ctr() +
 	test_decrypt_ecb() + test_encrypt_ecb();
     test_encrypt_ecb_verbose();
-
+	*/
     return exit;
 }
 
@@ -230,19 +231,29 @@ static int test_encrypt_cbc(void)
 	fp=fopen("sample.txt","rb");
 	fseek(fp,0,SEEK_END);
 	size_of_file=ftell(fp);
-	printf("\nfile size=%d\n",size_of_file);
 	fseek(fp,0,0);
 	fread(data,sizeof(data),1,fp);
+	
 	for(int i=0;i<size_of_file;i++)
 		printf("%02X ",data[i]);
 
 
 	
     AES_init_ctx_iv(&ctx, key, iv);
-    AES_CBC_encrypt_buffer(&ctx, in, 64);
+    AES_CBC_encrypt_buffer(&ctx, data, (size_of_file-(size_of_file%16)+16));
 
-    printf("CBC encrypt: ");
+    printf("CBC encrypt: \n");
+	
+	for(int i=0;i<(size_of_file-(size_of_file%16)+16);i++)
+			printf("%02X ",data[i]);
 
+	AES_CBC_decrypt_buffer(&ctx,data,(size_of_file-(size_of_file%16)+16));
+    printf("\nCBC dncrypt: \n");
+
+	for(int i=0;i<(size_of_file-(size_of_file%16)+16);i++)
+			printf("%02X ",data[i]);
+	
+	/*	
     if (0 == memcmp((char*) out, (char*) in, 64)) {
         printf("SUCCESS!\n");
 	return(0);
@@ -250,6 +261,8 @@ static int test_encrypt_cbc(void)
         printf("FAILURE!\n");
 	return(1);
     }
+    */
+    return 1;
 }
 
 static int test_xcrypt_ctr(const char* xcrypt);
