@@ -21,7 +21,7 @@ static int test_decrypt_ecb(void);
 static void test_encrypt_ecb_verbose(void);
 
 
-int main(void)
+int main(int argc, char **argv)
 {
     int exit;
 
@@ -35,8 +35,8 @@ int main(void)
     printf("You need to specify a symbol between AES128, AES192 or AES256. Exiting");
     return 0;
 #endif
-
-    exit = test_encrypt_cbc();
+	if(argc==3)
+    exit = test_encrypt_cbc(argv[1],argv[2]);
 	/*+ test_decrypt_cbc() +
 	test_encrypt_ctr() + test_decrypt_ctr() +
 	test_decrypt_ecb() + test_encrypt_ecb();
@@ -197,7 +197,7 @@ void read_file(char *fileName, uint8_t **data,int *size)
 	}	
 }
 
-static int test_encrypt_cbc(void)
+static int test_encrypt_cbc(char *inKey, char *fileName)
 {
 #if defined(AES256)
     uint8_t key[] = { 0x60, 0x3d, 0xeb, 0x10, 0x15, 0xca, 0x71, 0xbe, 0x2b, 0x73, 0xae, 0xf0, 0x85, 0x7d, 0x77, 0x81,
@@ -227,11 +227,22 @@ static int test_encrypt_cbc(void)
     struct AES_ctx ctx,ctx_decrypt;
     	uint8_t data[2000];
 	int size_of_file=0;
-	FILE *fp=NULL,*fp_write=NULL;
+	FILE *fp=NULL,*fp_write=NULL,*fp_key=NULL;
+	uint8_t in_key[16];
 
 	memset(data,0x00,sizeof(data));
+
+	fp_key=fopen(inKey,"rb");
+	if(fp_key==NULL)
+		goto end;
+	else
+	{
+		fread(in_key,16,1,fp_key);
+	}
+
+
 	
-	fp=fopen("sample.txt","rb");
+	fp=fopen(fileName,"rb");
 	fseek(fp,0,SEEK_END);
 	size_of_file=ftell(fp);
 	fseek(fp,0,0);
@@ -242,7 +253,7 @@ static int test_encrypt_cbc(void)
 
 
 	
-    AES_init_ctx_iv(&ctx, key, iv);
+    AES_init_ctx_iv(&ctx, fp_key, iv);
     AES_CBC_encrypt_buffer(&ctx, data, (size_of_file-(size_of_file%16)+16));
 
     printf("\nCBC encrypt: %d\n",(size_of_file-(size_of_file%16)+16));
@@ -252,22 +263,14 @@ static int test_encrypt_cbc(void)
 	for(int i=0;i<(size_of_file-(size_of_file%16)+16);i++)
 			printf("%02X ",data[i]);
 
-	AES_init_ctx_iv(&ctx_decrypt, key, iv);
+	AES_init_ctx_iv(&ctx_decrypt, fp_key, iv);
 	AES_CBC_decrypt_buffer(&ctx_decrypt,data,(size_of_file-(size_of_file%16)+16));
     printf("\nCBC dncrypt: \n");
 
 	for(int i=0;i<(size_of_file-(size_of_file%16)+16);i++)
 			printf("%02X ",data[i]);
-	
-	/*	
-    if (0 == memcmp((char*) out, (char*) in, 64)) {
-        printf("SUCCESS!\n");
-	return(0);
-    } else {
-        printf("FAILURE!\n");
-	return(1);
-    }
-    */
+
+	end:
     return 1;
 }
 
