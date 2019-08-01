@@ -245,7 +245,7 @@ static int test_encrypt_cbc(void)
     AES_init_ctx_iv(&ctx, key, iv);
     AES_CBC_encrypt_buffer(&ctx, data, (size_of_file-(size_of_file%16)+16));
 
-    printf("CBC encrypt: \n");
+    printf("\nCBC encrypt: %d\n",(size_of_file-(size_of_file%16)+16));
 	
 	for(int i=0;i<(size_of_file-(size_of_file%16)+16);i++)
 			printf("%02X ",data[i]);
