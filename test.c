@@ -268,6 +268,11 @@ static int test_encrypt_cbc(char *inKey, char *fileName)
     AES_CBC_encrypt_buffer(&ctx_key_encrypt, in_key,16);
 
 	fp_key_enc=fopen("in_key_enc","rb+");
+	if(fp_key_enc==NULL)
+	{
+		printf("\nFailed to open the file in_key_enc");
+		goto end;
+	}
 	fwrite(in_key,16,1,fp_key_enc);
 
 	end:
