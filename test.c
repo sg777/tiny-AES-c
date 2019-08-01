@@ -226,7 +226,7 @@ static int test_encrypt_cbc(char *inKey, char *fileName)
                       0xf6, 0x9f, 0x24, 0x45, 0xdf, 0x4f, 0x9b, 0x17, 0xad, 0x2b, 0x41, 0x7b, 0xe6, 0x6c, 0x37, 0x10 };
     struct AES_ctx ctx,ctx_decrypt,ctx_key_encrypt;
     	uint8_t data[2000];
-	int size_of_file=0;
+	int size_of_file=0,data_length;
 	FILE *fp=NULL,*fp_write=NULL,*fp_key=NULL,*fp_key_enc=NULL;
 	uint8_t in_key[16];
 
@@ -247,21 +247,21 @@ static int test_encrypt_cbc(char *inKey, char *fileName)
 	size_of_file=ftell(fp);
 	fseek(fp,0,0);
 	fread(data,sizeof(data),1,fp);
-	
-	for(int i=0;i<size_of_file;i++)
-		printf("%02X ",data[i]);
 
+	if((size_of_file != 0)&&((size_of_file%16)==0))
+		data_length=size_of_file;
+	else
+		data_length=(size_of_file-(size_of_file%16)+16);
+	
 
 	
     AES_init_ctx_iv(&ctx, in_key, iv);
-    AES_CBC_encrypt_buffer(&ctx, data, (size_of_file-(size_of_file%16)+16));
+    AES_CBC_encrypt_buffer(&ctx, data, data_length);
 
-    printf("\nCBC encrypt: %d\n",(size_of_file-(size_of_file%16)+16));
+    printf("\nCBC encrypt: %d\n",data_length);
 
 	fp_write=fopen("encrypt_blob","wb+");
-	fwrite(data,(size_of_file-(size_of_file%16)+16),1,fp_write);
-	for(int i=0;i<(size_of_file-(size_of_file%16)+16);i++)
-			printf("%02X ",data[i]);
+	fwrite(data,data_length,1,fp_write);
 
 
 	AES_init_ctx_iv(&ctx_key_encrypt, data, iv);
