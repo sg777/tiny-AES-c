@@ -227,7 +227,7 @@ static int test_encrypt_cbc(void)
     struct AES_ctx ctx,ctx_decrypt;
     	uint8_t data[2000];
 	int size_of_file=0;
-	FILE *fp=NULL;
+	FILE *fp=NULL,*fp_write=NULL;
 
 	memset(data,0x00,sizeof(data));
 	
@@ -246,7 +246,9 @@ static int test_encrypt_cbc(void)
     AES_CBC_encrypt_buffer(&ctx, data, (size_of_file-(size_of_file%16)+16));
 
     printf("\nCBC encrypt: %d\n",(size_of_file-(size_of_file%16)+16));
-	
+
+	fp_write=fopen("encrypt_blob","wb+");
+	fwrite(data,(size_of_file-(size_of_file%16)+16),1,fp_write);
 	for(int i=0;i<(size_of_file-(size_of_file%16)+16);i++)
 			printf("%02X ",data[i]);
 
