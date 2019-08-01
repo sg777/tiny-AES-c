@@ -224,7 +224,7 @@ static int test_encrypt_cbc(void)
                       0xae, 0x2d, 0x8a, 0x57, 0x1e, 0x03, 0xac, 0x9c, 0x9e, 0xb7, 0x6f, 0xac, 0x45, 0xaf, 0x8e, 0x51,
                       0x30, 0xc8, 0x1c, 0x46, 0xa3, 0x5c, 0xe4, 0x11, 0xe5, 0xfb, 0xc1, 0x19, 0x1a, 0x0a, 0x52, 0xef,
                       0xf6, 0x9f, 0x24, 0x45, 0xdf, 0x4f, 0x9b, 0x17, 0xad, 0x2b, 0x41, 0x7b, 0xe6, 0x6c, 0x37, 0x10 };
-    struct AES_ctx ctx;
+    struct AES_ctx ctx,ctx_decrypt;
     	uint8_t data[2000];
 	int size_of_file=0;
 	FILE *fp=NULL;
@@ -250,7 +250,8 @@ static int test_encrypt_cbc(void)
 	for(int i=0;i<(size_of_file-(size_of_file%16)+16);i++)
 			printf("%02X ",data[i]);
 
-	AES_CBC_decrypt_buffer(&ctx,data,(size_of_file-(size_of_file%16)+16));
+	AES_init_ctx_iv(&ctx_decrypt, key, iv);
+	AES_CBC_decrypt_buffer(&ctx_decrypt,data,(size_of_file-(size_of_file%16)+16));
     printf("\nCBC dncrypt: \n");
 
 	for(int i=0;i<(size_of_file-(size_of_file%16)+16);i++)
