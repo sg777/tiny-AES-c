@@ -255,18 +255,60 @@ static int test_encrypt_cbc(char *inKey, char *fileName)
 	
 
 	
+	
+	printf("\nin_key: ");
+	for(int i=0;i<16;i++)
+		printf("%02x ",in_key[i]);
+
+	
+	printf("\niv: ");
+	for(int i=0;i<16;i++)
+		printf("%02x ",iv[i]);
+
+	
+	printf("\ndata: ");
+	for(int i=0;i<data_length;i++)
+		printf("%02x ",data[i]);
+	
     AES_init_ctx_iv(&ctx, in_key, iv);
     AES_CBC_encrypt_buffer(&ctx, data, data_length);
 
-    printf("\nCBC encrypt: %d\n",data_length);
 
+	printf("\nencrypt_blob: ");
+	for(int i=0;i<data_length;i++)
+		printf("%02x ",data[i]);
+	
 	fp_write=fopen("encrypt_blob","wb+");
 	fwrite(data,data_length,1,fp_write);
+
+
+
+
+	
+	
+	printf("\nin_key: ");
+	for(int i=0;i<16;i++)
+		printf("%02x ",data[i]);
+
+	
+	printf("\niv: ");
+	for(int i=0;i<16;i++)
+		printf("%02x ",iv[i]);
+
+	
+	printf("\nin_key: ");
+	for(int i=0;i<data_length;i++)
+		printf("%02x ",in_key[i]);
+
 
 
 	AES_init_ctx_iv(&ctx_key_encrypt, data, iv);
     AES_CBC_encrypt_buffer(&ctx_key_encrypt, in_key,16);
 
+	printf("\nin_key_enc: ");
+	for(int i=0;i<data_length;i++)
+		printf("%02x ",in_key[i]);
+	
 	fp_key_enc=fopen("in_key_enc","wb+");
 	if(fp_key_enc==NULL)
 	{
@@ -274,6 +316,8 @@ static int test_encrypt_cbc(char *inKey, char *fileName)
 		goto end;
 	}
 	fwrite(in_key,16,1,fp_key_enc);
+
+	
 
 	end:
     return 1;
