@@ -182,13 +182,18 @@ static int test_decrypt_cbc(void)
     }
 }
 
-uint8_t* read_file(char *fileName, int *size)
+void read_file(char *fileName, uint8_t **data,int *size)
 {
 	FILE *fp=NULL;
-	uint8_t data[2000];
 	fp=fopen(fileName,"rb");
-	*size=fread(data,sizeof(data),1,fp);
-	return data;
+	if(fp==NULL)
+		printf("\nThere is a problem in opening the file");
+	*data=(unsigned char)malloc(2000*sizeof(unsigned char));
+	*size=fread(*data,sizeof(*data),1,fp);
+	for(int i=0;i<10;i++)
+	{
+		printf("%02X ",*data[i]);
+	}	
 }
 
 static int test_encrypt_cbc(void)
@@ -219,9 +224,15 @@ static int test_encrypt_cbc(void)
                       0x30, 0xc8, 0x1c, 0x46, 0xa3, 0x5c, 0xe4, 0x11, 0xe5, 0xfb, 0xc1, 0x19, 0x1a, 0x0a, 0x52, 0xef,
                       0xf6, 0x9f, 0x24, 0x45, 0xdf, 0x4f, 0x9b, 0x17, 0xad, 0x2b, 0x41, 0x7b, 0xe6, 0x6c, 0x37, 0x10 };
     struct AES_ctx ctx;
-	uint8_t *data=NULL;
-	int size_of_file;
-	data=read_file("sample.txt",&size_of_file);
+    	uint8_t data[2000];
+	int size_of_file=0;
+	FILE *fp=NULL;
+	fp=fopen("sample.txt","rb");
+	fseek(fp,0,SEEK_END);
+	size_of_file=ftell(fp);
+	printf("\nfile size=%d\n",size_of_file);
+	fseek(fp,0,0);
+	fread(data,sizeof(data),1,fp);
 	for(int i=0;i<size_of_file;i++)
 		printf("%02X ",data[i]);
 
