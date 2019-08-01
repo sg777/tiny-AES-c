@@ -228,6 +228,9 @@ static int test_encrypt_cbc(void)
     	uint8_t data[2000];
 	int size_of_file=0;
 	FILE *fp=NULL;
+
+	memset(data,0x00,sizeof(data));
+	
 	fp=fopen("sample.txt","rb");
 	fseek(fp,0,SEEK_END);
 	size_of_file=ftell(fp);
