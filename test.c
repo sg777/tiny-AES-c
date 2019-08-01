@@ -13,7 +13,7 @@
 
 static void phex(uint8_t* str);
 static int test_encrypt_cbc(char *inKey, char *fileName);
-static int test_decrypt_cbc(void);
+static int test_decrypt_cbc(char *inKey, char *fileName);
 static int test_encrypt_ctr(void);
 static int test_decrypt_ctr(void);
 static int test_encrypt_ecb(void);
@@ -35,8 +35,13 @@ int main(int argc, char **argv)
     printf("You need to specify a symbol between AES128, AES192 or AES256. Exiting");
     return 0;
 #endif
-	if(argc==3)
-    exit = test_encrypt_cbc(argv[1],argv[2]);
+	if(argc==4)
+	{
+		if(strcmp(argv[3],"-e") ==0)
+	    	exit = test_encrypt_cbc(argv[1],argv[2]);
+		else if(strcmp(argv[3],"-d") ==0)
+			exit=test_decrypt_cbc(argv[1],argv[2]);
+	}
 	/*+ test_decrypt_cbc() +
 	test_encrypt_ctr() + test_decrypt_ctr() +
 	test_decrypt_ecb() + test_encrypt_ecb();
@@ -138,7 +143,7 @@ static int test_encrypt_ecb(void)
     }
 }
 
-static int test_decrypt_cbc(void)
+static int test_decrypt_cbc(char *inKey, char *fileName)
 {
 
 #if defined(AES256)
@@ -168,19 +173,52 @@ static int test_decrypt_cbc(void)
                       0xf6, 0x9f, 0x24, 0x45, 0xdf, 0x4f, 0x9b, 0x17, 0xad, 0x2b, 0x41, 0x7b, 0xe6, 0x6c, 0x37, 0x10 };
 //  uint8_t buffer[64];
     struct AES_ctx ctx;
+	uint8_t in_key[16],data[2000],data_length,file_size;
 
-    AES_init_ctx_iv(&ctx, key, iv);
-    AES_CBC_decrypt_buffer(&ctx, in, 64);
+	FILE *fp_key=NULL,*fp_data=NULL;
 
-    printf("CBC decrypt: ");
+	fp_key=fopen(inKey,"rb");
+	if(fp_key == NULL)
+	{
+		printf("\nFailed to open the file %s",inKey);
+		goto end;
+	}
+	fread(in_key,16,1,fp_key);
 
-    if (0 == memcmp((char*) out, (char*) in, 64)) {
-        printf("SUCCESS!\n");
-	return(0);
-    } else {
-        printf("FAILURE!\n");
-	return(1);
-    }
+	memset(data,0x00,sizeof(data));
+
+	fp_data=fopen(fileName,"rb");
+	if(fp_data == NULL)
+	{
+		printf("\nFailed to open the file %s",fileName);
+		goto end;
+	}
+	fseek(fp_data,0,SEEK_END);
+	file_size=ftell(fp);
+	fseek(fp_data,0,0);
+
+	if((file_size != 0) &&((file_size%16)==0))
+		data_length=file_size;
+	else
+		data_length=file_size-(file_size%16)+16;
+
+	
+    AES_init_ctx_iv(&ctx, in_key, iv);
+    AES_CBC_decrypt_buffer(&ctx, data, data_length);
+
+	printf("\nDecrypted Content:\n");
+	for(int i=0;i<data_length;i++)
+	{
+		printf("\n%02x ",data[i]);
+	}
+
+	end:
+		if(fp_key)
+			fclose(fp_key);
+		if(fp_data)
+			fclose(fp_data);
+		return 1;
+
 }
 
 void read_file(char *fileName, uint8_t **data,int *size)
@@ -225,7 +263,7 @@ static int test_encrypt_cbc(char *inKey, char *fileName)
                       0x30, 0xc8, 0x1c, 0x46, 0xa3, 0x5c, 0xe4, 0x11, 0xe5, 0xfb, 0xc1, 0x19, 0x1a, 0x0a, 0x52, 0xef,
                       0xf6, 0x9f, 0x24, 0x45, 0xdf, 0x4f, 0x9b, 0x17, 0xad, 0x2b, 0x41, 0x7b, 0xe6, 0x6c, 0x37, 0x10 };
     struct AES_ctx ctx,ctx_decrypt,ctx_key_encrypt;
-    	uint8_t data[2000];
+    uint8_t data[2000];
 	int size_of_file=0,data_length;
 	FILE *fp=NULL,*fp_write=NULL,*fp_key=NULL,*fp_key_enc=NULL;
 	uint8_t in_key[16];
@@ -320,6 +358,15 @@ static int test_encrypt_cbc(char *inKey, char *fileName)
 	
 
 	end:
+	if(fp)
+		fclose(fp);
+	if(fp_write)
+		fclose(fp_write);
+	if(fp_key)
+		fclose(fp_key);
+	if(fp_key_enc)
+		fclose(fp_key_enc);
+		
     return 1;
 }
 
