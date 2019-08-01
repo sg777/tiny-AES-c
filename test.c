@@ -12,7 +12,7 @@
 
 
 static void phex(uint8_t* str);
-static int test_encrypt_cbc(void);
+static int test_encrypt_cbc(char *inKey, char *fileName);
 static int test_decrypt_cbc(void);
 static int test_encrypt_ctr(void);
 static int test_decrypt_ctr(void);
