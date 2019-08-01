@@ -203,13 +203,28 @@ static int test_decrypt_cbc(char *inKey, char *fileName)
 		data_length=file_size-(file_size%16)+16;
 
 	
+	
+	printf("\nin_key: ");
+	for(int i=0;i<16;i++)
+		printf("%02x ",in_key[i]);
+
+	
+	printf("\niv: ");
+	for(int i=0;i<16;i++)
+		printf("%02x ",iv[i]);
+
+	
+	printf("\ndata: ");
+	for(int i=0;i<data_length;i++)
+		printf("%02x ",data[i]);
+	
     AES_init_ctx_iv(&ctx, in_key, iv);
     AES_CBC_decrypt_buffer(&ctx, data, data_length);
 
 	printf("\nDecrypted Content:\n");
 	for(int i=0;i<data_length;i++)
 	{
-		printf("\n%02x ",data[i]);
+		printf("%02x ",data[i]);
 	}
 
 	end:
